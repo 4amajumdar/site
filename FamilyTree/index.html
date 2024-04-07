@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Tree</title>
+
+    <script src="main.js" utf-8 defer></script>
+    <script src="data.js" utf-8 defer></script>
+
+</head>
+<style>
+    body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        width: 95%;
+        margin: 0 auto;
+    }
+
+    .flex-container {
+        display: flex;
+        flex-wrap: wrap;
+        background-color: lightblue;
+    }
+
+    .F {
+        background-color: pink;
+    }
+
+    .flex-container>div {
+        /* background-color: #f1f1f1; */
+        /* border: .1rem solid; */
+        margin: .5rem;
+        padding: .5rem;
+        font-size: 1rem;
+    }
+
+    .selected {
+        box-shadow: inset 0 0 0 .1rem black;
+    }
+
+    #children>div {
+        border: .1rem solid;
+    }
+
+    #generation {
+        break-inside: avoid;
+    }
+</style>
+
+<body>
+    <h1 id="maintitle">Rajaram Talukdar's Family Tree</h1>
+    <h2>Beta Version</h2>
+    <!-- <input type="search" id="fname" name="fname" placeholder="Serach...">
+    <button id="searchbutton" onclick="buttonclicked(this)">Search</button>
+    <button id="">Another</button>
+    <br>
+    <dialog>
+        <form>
+            <input type="search" id="fname" name="fname" placeholder="Serach...">
+            <br>
+            <div>
+                <input type="radio" value="one"><br>
+                <input type="radio" value="two"><br>
+                <input type="radio" value="three"><br>
+
+            </div>
+        </form>
+        <br>
+    </dialog> -->
+    <br>
+    <div id="generations"></div>
+    <br>
+    <details>
+        <summary>Rajani Kant Majumdar's Notebook</summary>
+        <br>
+        <img src="RKM.jpeg" alt="Family Tree as in Rajani Kant Majumdar's Notebook" style="border: .1rem solid;"> 
+    </details>
+    <br>
+    <!-- <details>
+        <summary>Sanat Kumar Majumdar's notes</summary>
+        <br>
+        <img src="RKM.jpeg" alt="Family Tree as in Rajani Kant Majumdar's Notebook" style="border: .1rem solid;"> 
+    </details> -->
+
+    <template id="genaration-template">
+        <div id="geneation">
+            <div id="parents" class="flex-container">
+            </div>
+            <div id="children" class="flex-container">
+            </div>
+            <br>
+        </div>
+    </template>
+    <template id="pesron-template">
+        <div>X</div>
+    </template>
+
+</body>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        drawTree();
+    });
+
+    function buttonclicked(button) {
+        const dialog = document.querySelector("dialog")
+        dialog.showModal()
+    }
+</script>
+
+</html>
