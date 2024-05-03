@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Test Data Page</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script src="sample-data.js" defer charset="utf-8"></script>
+    </head>
+    <style>
+        html {
+            font-size: 100%;
+            font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+                "Lucida Sans", Arial, sans-serif;
+        }
+        div {
+            padding: 10px;
+            min-width: 340px;
+            height: 100%;
+        }
+        svg rect {
+            /* .fade-in { */
+            animation: 2s ease fade-in;
+        }
+        @keyframes fade-in {
+            from {
+                /* scale: 0.8; */
+                opacity: 0;
+            }
+            to {
+                /* scale: 1; */
+                opacity: 1;
+            }
+        }
+    </style>
+
+    <body>
+        <h1>Main Heading</h1>
+        <h2>Sub Heading</h2>
+        <h3>Bar</h3>
+        <div id="bar" class="fade-in"></div>
+        <br />
+        <h3>Two by Two</h3>
+        <div id="twotwo" class="fade-in"></div>
+
+        <script type="module">
+            import { maasPlot } from "./maasPlot.js"
+
+            function createChart(selector, plot) {
+                document.querySelector(selector).appendChild(plot)
+            }
+
+            createChart(
+                "#bar",
+                maasPlot.barChart({
+                    data: [
+                        { pri: "P1", count: 100 * Math.random() },
+                        { pri: "P2", count: 100 * Math.random() },
+                        { pri: "P3", count: 100 * Math.random() },
+                        { pri: "P4", count: 100 * Math.random() },
+                    ],
+                    x: "pri",
+                    y: "count",
+                    xLabel: "Priority",
+                    yLabel: "Count",
+                    fill: "blue",
+                    id: "1",
+                    callback: (id, description) => {
+                        console.log("callback", { id, description })
+                    },
+                })
+            )
+
+            const d = []
+            for (let i = 1; i <= 5; i++) {
+                for (let j = 1; j <= 5; j++) {
+                    d.push({
+                        season: i,
+                        episode: j,
+                        rating: 100 * Math.random(), //i * 10 + j,
+                    })
+                }
+            }
+            createChart(
+                "#twotwo",
+                maasPlot.twoByTwoChart({
+                    data: d,
+                    x: "season",
+                    xLabel: "Season",
+                    y: "episode",
+                    yLabel: "Episodes",
+                    z: "rating",
+                    // fill: "rating", ///////////////////////////explore
+                    id: "2",
+                    callback: (id, description) => {
+                        console.log("callback", { id, description })
+                    },
+                })
+            )
+        </script>
+    </body>
+</html>
