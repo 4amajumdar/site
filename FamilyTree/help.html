@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Family Tree: Help</title>
+    <link rel="stylesheet" href="opn.css" />
+    <link rel="stylesheet" href="main.css" />
+  </head>
+  <style>
+    table {
+      th,
+      td {
+        text-align: left;
+      }
+    }
+    c {
+      font-family: monospace;
+      background-color: var(--gray-3);
+    }
+    /* p,li,tr {
+      font-size: 1.1em;
+    } */
+  </style>
+  <body>
+    <!-- https://onlinehtmleditor.dev/ -->
+    <h1>Help for Family Tree</h1>
+    <h2>Introduction</h2>
+    <p>
+      This is a simple free app to view family trees. &nbsp;The input is a
+      comma-separated file (as described later) and the output is an interactive
+      family tree.&nbsp;
+    </p>
+    <h2>Input file</h2>
+    <p>The input is a csv (comma-separated file) with the following field:</p>
+    <ul>
+      <li>
+        Each union is recoded in a separate row. A union can have one or two
+        individuals as describes below.
+        <ul>
+          <li>
+            An individual will have a name and one or many options in brackets.
+            The name can be words separated by space.
+          </li>
+          <li>
+            Each option is a key followed by space followed by a word:
+            <ul>
+              <li>
+                key = <c>aka</c> followed by a word (other name); aka stands for
+                also known as.
+              </li>
+              <li>
+                key = <c>gender</c> followed by f or m for female and male
+                respectively. If no gender is provided male is assumed
+              </li>
+              <li>Examples in table below</li>
+            </ul>
+          </li>
+          <li>
+            If there is a spouse, then it is recorded with a + sign. Examples in
+            table below.
+          </li>
+          <li>
+            When a spouse is present, best practice suggests that the first individual must be the direct
+            descendant of the family.
+          </li>
+          <br />
+          <table>
+            <p>Examples of individuals, unions and options</p>
+            <thead>
+              <tr>
+                <th>Written as</th>
+                <th>Means</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><c>xxx (gender f)</c></td>
+                <td>Individual with name = xxx, gender = female</td>
+              </tr>
+              <tr>
+                <td><c>xxx xyz(gender m)</c></td>
+                <td>
+                  Individual with name = xxx xyz, gender = male. If no gender is
+                  provided it defaults to male
+                </td>
+              </tr>
+              <tr>
+                <td><c>xxx</c></td>
+                <td>Individual with name = xxx, gender = male</td>
+              </tr>
+              <tr>
+                <td><c>xxx (aka yyy)</c></td>
+                <td>Individual with name = xxx, aka = yyy, gender = male</td>
+              </tr>
+              <tr>
+                <td><c>xxx (aka yyy gender f)</c></td>
+                <td>Individual with name = xxx, aka = yyy, gender = female</td>
+              </tr>
+              <tr>
+                <td><c>xxx (gender f aka yyy)</c></td>
+                <td>Individual with name = xxx, aka = yyy, gender = female</td>
+              </tr>
+
+              <tr>
+                <td><c>xxx xyz + yyy (gender f)</c></td>
+                <td>
+                  Direct descendant's name = xxx xyz, gender = male and spouse
+                  with name = yyy, gender = female
+                </td>
+              </tr>
+              <tr>
+                <td><c>xxx (gender f) + yyy (aka zzz)</c></td>
+                <td>
+                  Direct descendant's name = xxx, gender = female and spouse
+                  with name = yyy, aka = zzz, gender = male
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <br />
+        </ul>
+      </li>
+
+      <li>The first union from the first generation is written in column 1.</li>
+      <li>
+        The children are written in rows below the parents, one row for a child, and in column N+1
+        where the parents are in column N. Best practice suggests that childen are recorded oldest child is one the very next row after parents.
+      </li>
+      <li>
+        If in a row the first letter in the first column is a # it means it is a
+        directive to the app.
+      </li>
+      <ul>
+        <li>
+          <c>#title</c> means app will display the title with the words
+          following the directive. if is not provided the app uses the first
+          descendant's name as default.
+        </li>
+        <li>
+          <c>#note</c> means the app will display note with the words following
+          the directive. Multiple notes are allowed
+        </li>
+      </ul>
+      <li>
+        Example of a csv file
+        <a
+          href="https://docs.google.com/spreadsheets/d/e/2PACX-1vSQqvT3WCpTuIlqLcqBYDRoF4Wi8tNVM4-Xu-A6sm_r4kioWKhgTLiwdFm37Fr6uPzPU3Uafl54XBmP/pub?gid=0&single=true"
+          target="_blank"
+          >here</a
+        >
+      </li>
+
+      <br />
+      <!-- <table class="csv-example">
+        
+        <thead>
+          <tr>
+            <th>1</th>
+            <th>2</th>
+            <th>3</th>
+            <th>4</th>
+            <th>5</th>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="5">
+              Great Grandfather (aka GGPa) + Great Grandma (gender f);
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td>
+            <td colspan="4">Grandfather (aka Pops) + Grandma (gender f)&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td colspan="3">Father (aka Dad) + Ma (gender f)&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td colspan="2">Elder Sister (aka Sis gender f)</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>Niece (gender f)</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+          </tr>
+        </tbody>
+      </table> -->
+      <br />
+    </ul>
+  </body>
+</html>

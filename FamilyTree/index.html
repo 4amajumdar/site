@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Family Tree</title>
+    <link rel="stylesheet" href="opn.css" />
+    <link rel="stylesheet" href="main.css" />
+    <script src="main.js" utf-8></script>
+    <script src="readfile.js"></script>
+  </head>
+
+  <body>
+    <div class="sidenav">
+      <a href="javascript:void(0)" class="closebtn" onclick="showNav(false)"
+        >&times;</a
+      >
+      <a href="#" onclick="showNav(false);showLoadFileDialog()">Load File</a>
+      <a href="#" onclick="showNav(false);$.setView('right-left')">Right left View</a>
+      <!-- <a href="#" onclick="showNav(false);$.setView('lineage')">Lineage View</a> -->
+      <a href="#" onclick="showNav(false);$.setView('top-down')">Top down View</a>
+      <br />
+      <div id="presets"></div>
+      <a href="help.html" target="_blank">Help</a>
+    </div>
+    <dialog id="load-file-dialog">
+      <form>
+        <h3>Load file</h3>
+        <hr />
+        <button id="load-local-file" value="default">Load local file</button>
+        <hr />
+        <p>Load remote file:</p>
+        <input type="remote-file" />
+        <hr />
+        <button value="cancel" formmethod="dialog">Cancel</button>
+        <button id="confirm" disabled value="default">Confirm</button>
+      </form>
+    </dialog>
+    <input type="file" id="file-input" style="display: none" />
+    <div id="loading">
+      <div>
+        <h2>Loading...</h2>
+        <div id="spinner"></div>
+      </div>
+    </div>
+    <main>
+      <h1>
+        <span class="menu" onclick="showNav(true)">&#9776;</span>
+        <span id="main-title">Family Tree</span>
+      </h1>
+      <div id="comments">
+
+      </div>
+      <h2 id="sub-title"></h2>
+      <br />
+      <!-- <div id="tree" onclick="childClicked(this,event)"></div> -->
+      <div id="tree"></div>
+      <br />
+      <div id="notes"></div>
+      <br />
+      <p id="file-name"></p>
+      <p id="error" style="color: red"></p>
+      <p id="warning" style="color: orange"></p>
+      <br />
+      <footer>
+        <p>Family Tree (Version Beta Apr 2025)</p>
+        <p>Copyright &#169; 2025 Abhijit Majumdar</p>
+        <a
+          href="mailto: a.majumdar85+FamilyTree@gmail.com?&subject=Feedback%20on%20Family%2DTree"
+        >
+          Click to send feedback email</a
+        >
+      </footer>
+    </main>
+    <template id="generation-template">
+      <div id="geneation">
+        <!-- <div id="generation-number"></div> -->
+        <div id="parents" class="flex-container"></div>
+        <div style="height: 0.1rem"></div>
+        <div id="children" class="flex-container"></div>
+        <br />
+      </div>
+    </template>
+    <template id="parents-template">
+      <div id="parents" class="flex-container">
+        <!-- <p>
+          <span id="main"></span>
+          <span id="plus">+</span>
+          <span id="spouse"></span>
+        </p> -->
+        <div id="main"></div>
+        <div id="plus">+</div>
+        <div id="spouse"></div>
+      </div>
+    </template>
+    <template id="radio-template">
+      <p>
+        <input type="radio" name="radio" value="x" />
+        <label>display </label>
+      </p>
+    </template>
+    <template id="pesron-template">
+      <div>X</div>
+    </template>
+  </body>
+</html>
