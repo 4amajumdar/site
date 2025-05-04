@@ -15,10 +15,14 @@
       <a href="javascript:void(0)" class="closebtn" onclick="showNav(false)"
         >&times;</a
       >
-      <a href="#" onclick="showNav(false);showLoadFileDialog()">Load File</a>
-      <a href="#" onclick="showNav(false);$.setView('right-left')">Right left View</a>
+      <a href="#" onclick="showNav(false);showLoadFileDialog()">Load file</a>
+      <a href="#" onclick="showNav(false);$.setView('left-right')"
+        >Left right view</a
+      >
       <!-- <a href="#" onclick="showNav(false);$.setView('lineage')">Lineage View</a> -->
-      <a href="#" onclick="showNav(false);$.setView('top-down')">Top down View</a>
+      <a href="#" onclick="showNav(false);$.setView('top-down')"
+        >Top down view</a
+      >
       <br />
       <div id="presets"></div>
       <a href="help.html" target="_blank">Help</a>
@@ -48,9 +52,7 @@
         <span class="menu" onclick="showNav(true)">&#9776;</span>
         <span id="main-title">Family Tree</span>
       </h1>
-      <div id="comments">
-
-      </div>
+      <div id="comments"></div>
       <h2 id="sub-title"></h2>
       <br />
       <!-- <div id="tree" onclick="childClicked(this,event)"></div> -->
@@ -63,8 +65,8 @@
       <p id="warning" style="color: orange"></p>
       <br />
       <footer>
-        <p>Family Tree (Version Beta Apr 2025)</p>
-        <p>Copyright &#169; 2025 Abhijit Majumdar</p>
+        Family Tree (Version Beta Apr 2025). Copyright &#169; 2025 Abhijit
+        Majumdar.
         <a
           href="mailto: a.majumdar85+FamilyTree@gmail.com?&subject=Feedback%20on%20Family%2DTree"
         >

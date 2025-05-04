@@ -15,21 +15,15 @@ async function streamCsvRecords(url, options, callback) {
     ? Infinity
     : preview;
   let count = 0;
+  console.log(previewCount)
   try {
     function parse(raw) {
       if (!hasHeaders) return raw;
-      const record = {};
+      const data = {};
       for (let i = 0; i < header.length; i++) {
-        record[header[i]] = raw[i] ? raw[i] : "";
+        data[header[i]] = raw[i] ? raw[i] : "";
       }
-      return record;
-    }
-    {
-      // const response = await fetch(url, { method: "HEAD" });
-      // if (response.ok) {
-      //   const contentLength = response.headers.get("Content-Length");
-      //   console.log(contentLength);
-      // }
+      return data;
     }
 
     const response = await fetch(url);
@@ -38,23 +32,23 @@ async function streamCsvRecords(url, options, callback) {
         `Failed to fetch CSV file: ${response.status} - ${response.statusText}`
       );
     }
-    
+
     const reader = response.body.getReader();
     const decoder = new TextDecoder("utf-8"); // Assuming UTF-8 encoding
     let remainingData = "";
     let header = null;
     while (true) {
       const { done, value } = await reader.read();
-      if (count > previewCount) {
-        callback({ action: "end", count });
-        break; // Exit the loop when the stream is finished
-      }
       if (done) {
         // Process any remaining data after the last chunk
         if (remainingData.trim()) {
+          if (count >= previewCount) {
+            callback({ action: "end", count });
+            break;
+          }
           const lastLineValues = remainingData.split(",").map((v) => v.trim());
           count++;
-          callback({ action: "step", data: parse(lastLineValues) });
+          callback({ action: "step", data: parse(lastLineValues), count });
         }
         callback({ action: "end", count });
         break; // Exit the loop when the stream is finished
@@ -66,26 +60,29 @@ async function streamCsvRecords(url, options, callback) {
       const lines = data.split("\n");
       remainingData = lines.pop() || ""; // Keep the last potentially incomplete line
 
-      if (!header && lines.length > 0) {
-        header = lines
-          .shift()
-          .split(",")
-          .map((h, i) => {
-            const hTrim = h.trim();
-            return hasHeaders && hTrim === "" ? `Column ${i}` : hTrim;
-          });
-
-        if (!hasHeaders) {
-          count++;
-          callback({ action: "step", data: header, count });
-        }
+      if (!header) {
+        header =
+          hasHeaders && lines.length > 0
+            ? lines
+                .shift()
+                .split(",")
+                .map((h, i) => {
+                  const hTrim = h.trim();
+                  return hTrim === "" ? `Column ${i}` : hTrim;
+                })
+            : "no-header";
       }
 
       if (header) {
         for (const line of lines) {
           const values = line.split(",").map((v) => v.trim());
+          if (count >= previewCount) break;
           count++;
           callback({ action: "step", data: parse(values), count });
+        }
+        if (count >= previewCount) {
+          callback({ action: "end", count });
+          break;
         }
       }
     }
@@ -94,8 +91,11 @@ async function streamCsvRecords(url, options, callback) {
     callback({ action: "error", error, count });
   }
   function removeUnprintable(str) {
-    return str.replace(/[^a-zA-Z0-9]/g, ' ')
-    return str.replace(/[\x00-\x1F\x7F-\xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]/g, '');
+    return str.replace(/[^a-zA-Z0-9]/g, " ");
+    return str.replace(
+      /[\x00-\x1F\x7F-\xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]/g,
+      ""
+    );
   }
 }
 

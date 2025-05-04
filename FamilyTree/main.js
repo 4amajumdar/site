@@ -3,7 +3,7 @@
 //introduce page
 //include comments
 //fix file name, error
-//fix if a row is indeneted too much
+//fix print view
 document.addEventListener("DOMContentLoaded", () => {
   showSpinner(true);
   setPreset();
@@ -87,7 +87,7 @@ function showError(err) {
 const $ = (function () {
   let currentFile;
   let individuals = [];
-  let view = "right-left";
+  let view = "left-right";
   const startID = 0;
   return { setView, draw, getLineage, search };
 
@@ -175,7 +175,7 @@ const $ = (function () {
       div.setAttribute("class", view);
       if (view === "top-down") drawTopDown();
       // if (view === "lineage") drawLineage(id);
-      if (view === "right-left") drawRightLeft();
+      if (view === "left-right") drawRightLeft();
     }
   }
   //abhijit.majumdar@no-code-dashboard.com
@@ -332,9 +332,11 @@ const $ = (function () {
 
     const div = document.querySelector("#tree");
 
-    const root = document.querySelector(":root");
-    root.style.setProperty("--columns", maxCol);
-    root.style.setProperty("--rows", maxRow);
+    // const root = document.querySelector(":root");
+    // root.style.setProperty("--columns", maxCol);
+    // root.style.setProperty("--rows", maxRow);
+    div.setAttribute("grid-template-columns",`repeat(${maxCol}, 1fr`);
+    div.setAttribute("grid-template-rows",`repeat(${maxRow}, 1fr grid-auto-rows`);
     individuals.forEach((p) => {
       const union = newDrawIndividual(p, {}, true);
       union.id = "person-" + p.ID;
@@ -527,7 +529,6 @@ const parents = [];
 const param = {};
 
 function callback({ action, error, data, count }) {
-  // console.log({ action, error, row, parser, count });
   if (action === "error") {
     showError("Unbale to load config. " + error);
     console.log(count, error);
@@ -662,7 +663,7 @@ async function readCsvFile(fileName, callback) {
   await new Promise((resolve) => {
     streamCsvRecords(
       fileName,
-      { hasHeaders: false }, //preview: 5
+      { hasHeaders: false},
       ({ action, data, error, count }) => {
         callback({ action, error, data, count });
         if (action === "error") resolve(0);

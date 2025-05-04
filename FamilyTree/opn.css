@@ -447,9 +447,9 @@
 :where(li) {
   padding-inline-start: var(--size-2);
 }
-/* :where(li, dd, figcaption) {
+:where(li, dd, figcaption) {
   max-inline-size: var(--size-content-2);
-} */
+}
 :where(p) {
   text-wrap: pretty;
   max-inline-size: var(--size-content-3);
@@ -491,7 +491,7 @@
 :where(:not(blockquote) > cite) {
   padding-inline-start: var(--size-2);
 }
-/* :where(summary) {
+:where(summary) {
   background: var(--surface-3);
   border-radius: var(--radius-2);
   margin: calc(var(--size-2) * -1) calc(var(--size-3) * -1);
@@ -507,7 +507,7 @@
   border-end-end-radius: 0;
   border-end-start-radius: 0;
   margin-bottom: var(--size-2);
-} */
+}
 :where(fieldset) {
   border: var(--border-size-1) solid var(--surface-4);
   border-radius: var(--radius-2);
