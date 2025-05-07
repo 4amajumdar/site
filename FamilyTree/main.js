@@ -83,13 +83,22 @@ function showError(err) {
   const error = document.querySelector("#error");
   error.textContent = typeof err === "string" ? err : JSON.stringify(err);
 }
-
+let showGeneration = false;
+function toggleGen() {
+  const trees = document.querySelector("#trees");
+  trees.classList.toggle("show-generation");
+  const showGeneration = trees.classList.contains("show-generation");
+  const showGenMenu = document.querySelector("#show-gen-menu");
+  showGenMenu.textContent = showGeneration
+    ? "Hide generation"
+    : "Show generation";
+}
 const $ = (function () {
   let currentFile;
   let individuals = [];
   let view = "left-right";
   const startID = 0;
-  return { setView, draw, getLineage, search };
+  return { setView, draw };
 
   function getDisplayName(id) {
     const { name, aka } = individuals[id];
@@ -186,7 +195,11 @@ const $ = (function () {
     const styles = { ...defaultStyles, ...options.styles };
     // const individual = individuals[id];
     const person = document.createElement("div");
-    const { name, gender, aka, ID, spouse } = individual;
+    const { name, gender, aka, ID, spouse, gen } = individual;
+    const genSpan = document.createElement("span");
+    genSpan.textContent = gen + ": ";
+    genSpan.classList.add("gen");
+    person.append(genSpan);
     const first = document.createElement("span");
     first.classList.add(gender ? gender : "M");
     first.textContent = name + (aka ? ` (${aka})` : "");
@@ -335,8 +348,11 @@ const $ = (function () {
     // const root = document.querySelector(":root");
     // root.style.setProperty("--columns", maxCol);
     // root.style.setProperty("--rows", maxRow);
-    div.setAttribute("grid-template-columns",`repeat(${maxCol}, 1fr`);
-    div.setAttribute("grid-template-rows",`repeat(${maxRow}, 1fr grid-auto-rows`);
+    div.setAttribute("grid-template-columns", `repeat(${maxCol}, 1fr`);
+    div.setAttribute(
+      "grid-template-rows",
+      `repeat(${maxRow}, 1fr grid-auto-rows`
+    );
     individuals.forEach((p) => {
       const union = newDrawIndividual(p, {}, true);
       union.id = "person-" + p.ID;
@@ -346,20 +362,20 @@ const $ = (function () {
       union.title = `${p.name} (row ${p.row}, column ${p.column})`;
       div.append(union);
     });
-    function drawPerson(id, withSpouse = true) {
-      const clone = getElementsFromTemplate("#parents-template"); //document.createElement("div");
-      const union = clone.querySelector("#parents");
+    // function drawPerson(id, withSpouse = true) {
+    //   const clone = getElementsFromTemplate("#parents-template"); //document.createElement("div");
+    //   const union = clone.querySelector("#parents");
 
-      const first = union.querySelector("#main");
-      first.append(newDrawIndividual(individuals[id]));
-      const spouse = withSpouse ? individuals[id].spouse : undefined;
-      const second = union.querySelector("#spouse");
-      if (!spouse) {
-        union.querySelector("#plus").remove();
-        second.remove();
-      } else second.append(newDrawIndividual(spouse));
-      return union;
-    }
+    //   const first = union.querySelector("#main");
+    //   first.append(newDrawIndividual(individuals[id]));
+    //   const spouse = withSpouse ? individuals[id].spouse : undefined;
+    //   const second = union.querySelector("#spouse");
+    //   if (!spouse) {
+    //     union.querySelector("#plus").remove();
+    //     second.remove();
+    //   } else second.append(newDrawIndividual(spouse));
+    //   return union;
+    // }
   }
 
   function getLineage(id, direction = "down") {
@@ -400,86 +416,87 @@ const $ = (function () {
   //   drawChildren(generation, id, children);
   //   document.querySelector("#tree").appendChild(generation);
   // }
-  function drawParents(parentDiv, id, children) {
-    const individual = individuals[id];
-    const spouse = individual.spouse;
+  // function drawParents(parentDiv, id, children) {
+  //   const individual = individuals[id];
+  //   const spouse = individual.spouse;
 
-    //if (!spouse && children.length === 0) return
+  //   //if (!spouse && children.length === 0) return
 
-    // const parentDiv = generation.querySelector("#parents");
-    drawIndividual(parentDiv, individual);
+  //   // const parentDiv = generation.querySelector("#parents");
+  //   drawIndividual(parentDiv, individual);
 
-    if (!spouse) return;
-    const union = document.createElement("div");
-    union.textContent = "+";
-    parentDiv.append(union);
-    drawIndividual(parentDiv, spouse);
-  }
-  function drawChildren(generation, id, children) {
-    const div = generation.querySelector("#children");
-    if (children.length === 0) {
-      const p = document.createElement("p");
-      p.textContent = "None";
-      div.append(p);
-      div.remove();
-      return;
-    }
-    children.forEach((child, i) => drawIndividual(div, individuals[child]));
-  }
+  //   if (!spouse) return;
+  //   const union = document.createElement("div");
+  //   union.textContent = "+";
+  //   parentDiv.append(union);
+  //   drawIndividual(parentDiv, spouse);
+  // }
+  // function drawChildren(generation, id, children) {
+  //   const div = generation.querySelector("#children");
+  //   if (children.length === 0) {
+  //     const p = document.createElement("p");
+  //     p.textContent = "None";
+  //     div.append(p);
+  //     div.remove();
+  //     return;
+  //   }
+  //   children.forEach((child, i) => drawIndividual(div, individuals[child]));
+  // }
 
-  function drawIndividual(div, individual, options = {}) {
-    const { styles } = options;
+  // function drawIndividual(div, individual, options = {}) {
+  //   const { styles } = options;
 
-    const person = document.createElement("div");
+  //   const person = document.createElement("div");
 
-    const { name, gender, aka, ID } = individual;
-    person.textContent = name + (aka ? ` (${aka})` : "");
-    if (ID) person.setAttribute("id", "id" + ID);
-    person.classList.add(gender ? gender : "M");
-    person.style.textAlign = "center";
-    person.style.cursor = "default";
-    for (const style in styles) person.style[style] = styles[style];
+  //   const { name, gender, aka, ID, gen } = individual;
+  //   person.textContent =
+  //     (showGeneration ? gen + ": " : "x") + name + (aka ? ` (${aka})` : "");
+  //   if (ID) person.setAttribute("id", "id" + ID);
+  //   person.classList.add(gender ? gender : "M");
+  //   person.style.textAlign = "center";
+  //   person.style.cursor = "default";
+  //   for (const style in styles) person.style[style] = styles[style];
 
-    div.append(person);
-  }
+  //   div.append(person);
+  // }
 
-  function search(searchString) {
-    if (!searchString) return;
-    if (searchString.trim() === "") return;
-    const foundList = [];
-    var regex = new RegExp(searchString.trim(), "i");
-    individuals.forEach((individual) => {
-      const { ID, name, aka, spouse } = individual;
-      if (findString(name)) return;
-      if (findString(aka)) return;
-      if (spouse !== undefined && isNaN(spouse)) {
-        const { name, aka } = spouse;
-        if (findString(name, true)) return;
-        if (findString(aka, true)) return;
-      }
+  // function search(searchString) {
+  //   if (!searchString) return;
+  //   if (searchString.trim() === "") return;
+  //   const foundList = [];
+  //   var regex = new RegExp(searchString.trim(), "i");
+  //   individuals.forEach((individual) => {
+  //     const { ID, name, aka, spouse } = individual;
+  //     if (findString(name)) return;
+  //     if (findString(aka)) return;
+  //     if (spouse !== undefined && isNaN(spouse)) {
+  //       const { name, aka } = spouse;
+  //       if (findString(name, true)) return;
+  //       if (findString(aka, true)) return;
+  //     }
 
-      function findString(s, spouse = false) {
-        if (!s) return false;
-        const found = s.match(regex);
-        if (found) {
-          let display = getDisplayName(ID + 0);
-          if (spouse) {
-            display = s + ": " + display + "'s spouse";
-          } else {
-            const parent = individuals[ID].parent; //getParentOffspring(id);
-            if (parent) {
-              display += `: ${getDisplayName(parent)}'s child`;
-            }
-          }
-          foundList.push({ ID, display });
-          return true;
-        }
-        return false;
-      }
-    });
+  //     function findString(s, spouse = false) {
+  //       if (!s) return false;
+  //       const found = s.match(regex);
+  //       if (found) {
+  //         let display = getDisplayName(ID + 0);
+  //         if (spouse) {
+  //           display = s + ": " + display + "'s spouse";
+  //         } else {
+  //           const parent = individuals[ID].parent; //getParentOffspring(id);
+  //           if (parent) {
+  //             display += `: ${getDisplayName(parent)}'s child`;
+  //           }
+  //         }
+  //         foundList.push({ ID, display });
+  //         return true;
+  //       }
+  //       return false;
+  //     }
+  //   });
 
-    return foundList;
-  }
+  //   return foundList;
+  // }
 })();
 function childClicked(child, event) {
   //console.log(child, )
@@ -497,6 +514,7 @@ function childClicked(child, event) {
 }
 
 function markRowColumns(individuals) {
+  let gen = 1;
   let row = 1;
   let maxRow = row;
   let column = 1;
@@ -506,11 +524,14 @@ function markRowColumns(individuals) {
     const person = individuals[id];
     if (!person) return;
     person.row = row;
+    const multiGen = person.name.split(">").length;
+    person.gen = gen + (multiGen > 1 ? "-" + (gen + multiGen - 1) : "");
     person.column = column;
     const children = person.children;
     if (!children) return;
     if (children.length === 0) return;
     row++;
+    gen += multiGen;
     if (maxRow < row) maxRow = row;
     children.forEach((id) => {
       markPerson(id);
@@ -519,6 +540,7 @@ function markRowColumns(individuals) {
     person.span = column;
     column--;
     row--;
+    gen -= multiGen;
   }
 }
 let xxx = [];
@@ -545,21 +567,26 @@ function callback({ action, error, data, count }) {
     const allSpaces = gen === -1;
     if (allSpaces) return;
 
-    const isGenOK =
-      true ||
-      param.prevGen === -1 ||
-      gen <= param.prevGen ||
-      gen + 1 === param.prevGen;
-    if (!isGenOK) {
-      param.error = `Error in gen at row ${tokens}`;
-      console.log(param.error, param.prevGen, gen);
-      return;
+    // const isGenOK =
+    //   true ||
+    //   param.prevGen === -1 ||
+    //   gen <= param.prevGen ||
+    //   gen + 1 === param.prevGen;
+
+    let deltaGen = gen - param.prevGen;
+    while (param.prevGen !== -1 && deltaGen > 1) {
+      createIndividual("Missing parent");
+      // xxx.push({name: "Missing parent"});
+      deltaGen--;
+      // param.error = `Error in gen at row ${tokens}`;
+      // console.log(param.error, param.prevGen, gen);
+      // return;
     }
     param.prevGen = gen;
 
     if (isCommand()) return;
 
-    const persons = tokens[gen].split("|");
+    const persons = [tokens[gen]]; //.split("|");
     for (const person of persons) createIndividual(person.trim());
 
     function createIndividual(person) {
@@ -663,7 +690,7 @@ async function readCsvFile(fileName, callback) {
   await new Promise((resolve) => {
     streamCsvRecords(
       fileName,
-      { hasHeaders: false},
+      { hasHeaders: false },
       ({ action, data, error, count }) => {
         callback({ action, error, data, count });
         if (action === "error") resolve(0);

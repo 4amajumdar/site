@@ -19,9 +19,11 @@
       <a href="#" onclick="showNav(false);$.setView('left-right')"
         >Left right view</a
       >
-      <!-- <a href="#" onclick="showNav(false);$.setView('lineage')">Lineage View</a> -->
       <a href="#" onclick="showNav(false);$.setView('top-down')"
         >Top down view</a
+      >
+      <a href="#" id="show-gen-menu" onclick="showNav(false);toggleGen()"
+        >Show generation</a
       >
       <br />
       <div id="presets"></div>
@@ -43,7 +45,7 @@
     <input type="file" id="file-input" style="display: none" />
     <div id="loading">
       <div>
-        <h2>Loading...</h2>
+        <h2>Loading tree...</h2>
         <div id="spinner"></div>
       </div>
     </div>
@@ -56,7 +58,9 @@
       <h2 id="sub-title"></h2>
       <br />
       <!-- <div id="tree" onclick="childClicked(this,event)"></div> -->
-      <div id="tree"></div>
+      <div id="trees">
+        <div id="tree"></div>
+      </div>
       <br />
       <div id="notes"></div>
       <br />
