@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Family Tree: Help</title>
+    <link rel="stylesheet" href="opn.css" />
+    <link rel="stylesheet" href="main.css" />
+  </head>
+  <style>
+    p {
+      margin-top: 1em;
+    }
+    table {
+      th,
+      td {
+        text-align: left;
+      }
+    }
+    c {
+      font-family: monospace;
+      background-color: var(--gray-3);
+    }
+    /* p,li,tr {
+      font-size: 1.1em;
+    } */
+  </style>
+  <body>
+    <!-- https://onlinehtmleditor.dev/ -->
+    <h1>Help for Family Tree</h1>
+    <br />
+    <h2>Introduction</h2>
+    <p>
+      This is a simple free app to view family trees. &nbsp;The input is a
+      comma-separated file (as described later) and the output is an interactive
+      family tree.&nbsp;
+    </p>
+    <br />
+    <h2>Input file</h2>
+    <p>
+      The input is a csv (comma-separated file) with the multiple rows. A csv file can be easily created using a spreadsheet app and saving the file as csv.
+    </p>
+    <p>
+      Each individual or union is recoded in a separate row. The row can have one or two
+      individuals as describes below.
+    </p>
+    <ul>
+      <li>
+        An individual will have a name and one or many options in brackets. The
+        name can be words separated by space.
+      </li>
+      <li>
+        Each option is a key followed by space followed by a word:
+        <ul>
+          <li>
+            key = <c>aka</c> followed by a word (other name); aka stands for
+            also known as.
+          </li>
+          <li>
+            key = <c>gender</c> followed by f or m for female and male
+            respectively. If no gender is provided male is assumed
+          </li>
+        </ul>
+      </li>
+      <li>
+        If there is a spouse, then it is recorded with a + sign. Examples in
+        table below.
+      </li>
+      <li>
+        When a spouse is present, best practice suggests that the first
+        individual must be the direct descendant of the family.
+      </li>
+      <table>
+        <p>Examples of individuals, unions and options</p>
+        <thead>
+          <tr>
+            <th>Written as</th>
+            <th>Means</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><c>xxx (gender f)</c></td>
+            <td>Individual with name = xxx, gender = female</td>
+          </tr>
+          <tr>
+            <td><c>xxx xyz(gender m)</c></td>
+            <td>
+              Individual with name = xxx xyz, gender = male. If no gender is
+              provided it defaults to male
+            </td>
+          </tr>
+          <tr>
+            <td><c>xxx</c></td>
+            <td>Individual with name = xxx, gender = male</td>
+          </tr>
+          <tr>
+            <td><c>xxx (aka yyy)</c></td>
+            <td>Individual with name = xxx, aka = yyy, gender = male</td>
+          </tr>
+          <tr>
+            <td><c>xxx (aka yyy gender f)</c></td>
+            <td>Individual with name = xxx, aka = yyy, gender = female</td>
+          </tr>
+          <tr>
+            <td><c>xxx (gender f aka yyy)</c></td>
+            <td>Individual with name = xxx, aka = yyy, gender = female</td>
+          </tr>
+
+          <tr>
+            <td><c>xxx xyz + yyy (gender f)</c></td>
+            <td>
+              Direct descendant's name = xxx xyz, gender = male and spouse with
+              name = yyy, gender = female
+            </td>
+          </tr>
+          <tr>
+            <td><c>xxx (gender f) + yyy (aka zzz)</c></td>
+            <td>
+              Direct descendant's name = xxx, gender = female and spouse with
+              name = yyy, aka = zzz, gender = male
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br />
+    </ul>
+
+    <p>
+      If the first letter in the first column of a row is a # it means it is a
+      directive to the app rather than an individual of union. 
+    </p>
+    <ul>
+      <li>
+        <c>#title</c> means app will display the title with the words following
+        the directive. if is not provided the app uses the first descendant's
+        name as default.
+      </li>
+      <li>
+        <c>#note</c> means the app will display note with the words following
+        the directive. Multiple notes are allowed
+      </li>
+    </ul>
+    <p>
+      The first individual or union from the first generation is written in column 1. The
+      children are written in rows below the parents, one row for a child, and
+      in column N+1 where the parents are in column N. Best practice suggests
+      that childen are recorded oldest child is one the very next row after
+      parents.
+    </p>
+     <p>
+      Example of a csv file is shown 
+      <a
+        href="https://docs.google.com/spreadsheets/d/e/2PACX-1vSQqvT3WCpTuIlqLcqBYDRoF4Wi8tNVM4-Xu-A6sm_r4kioWKhgTLiwdFm37Fr6uPzPU3Uafl54XBmP/pub?gid=0&single=true"
+        target="_blank"
+        >here</a
+      >
+    </p>
+    <br>
+    <h2>Output</h2>
+    <p>The family tree is initailly displayed as "left to right". The view can be changed to "top down" from the menu. </p>
+    <p> The hamberger menu is on the top left. The menu options are:</p>
+    <ul>
+        <li>Load file:  allows a new file to be loaded.</li>
+        <li>Left right view: displays tree "left to right".</li>
+        <li>Top down view: displays tree "top down".</li>
+        <li>Example: displays an sample tree</li>
+        <li>Help: displays help (this page).</li>
+    </ul>
+    <br />
+      <footer>
+        Family Tree (Version Beta Apr 2025). Copyright &#169; 2025 Abhijit Majumdar
+      </footer>
+  </body>
+</html>

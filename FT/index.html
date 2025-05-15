@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Family Tree</title>
+    <link rel="stylesheet" href="opn.css" />
+    <link rel="stylesheet" href="main.css" />
+    <script type="module" src="main.js" utf-8></script>
+    <!-- <script src="readfile.js"></script> -->
+  </head>
+
+  <body>
+    <div class="sidenav">
+      <a class="menu" id="close">&times;</a>
+      <a href="#" class="menu" id="load-file">Load file</a>
+      <a href="#" class="menu" id="set-view-left-right">Left right view</a>
+      <a href="#" class="menu" id="set-view-top-down">Top down view</a>
+      <a href="#" id="show-gen" class="menu">Show generation</a>
+      <br />
+      <div id="presets"></div>
+      <br />
+      <a href="help.html" id="show-help" class="menu" target="_blank">Help</a>
+    </div>
+    <dialog id="load-file-dialog">
+      <form>
+        <h3>Load file</h3>
+        <hr />
+        <button id="load-local-file" value="default">Load local file</button>
+        <hr />
+        <p>Load remote file:</p>
+        <input type="remote-file" />
+        <hr />
+        <button value="cancel" formmethod="dialog">Cancel</button>
+        <button id="confirm" disabled value="default">Confirm</button>
+      </form>
+    </dialog>
+    <input type="file" id="file-input" style="display: none" />
+    <div id="loading">
+      <h2>Loading...</h2>
+      <progress></progress>
+    </div>
+    <main style="visibility: hidden">
+      <h1>
+        <span class="menu" id="show">&#9776;</span>
+        <span id="main-title">Family Tree</span>
+      </h1>
+      <div id="comments"></div>
+      <h2 id="sub-title"></h2>
+      <br />
+      <!-- <div id="tree" onclick="childClicked(this,event)"></div> -->
+      <div id="trees">
+        <div id="tree"></div>
+      </div>
+      <br />
+      <div id="notes"></div>
+      <br />
+      <p id="file-name"></p>
+      <p id="error" style="color: red"></p>
+      <p id="warning" style="color: orange"></p>
+      <br />
+      <footer>
+        Family Tree (Version Beta Apr 2025). Copyright &#169; 2025 Abhijit
+        Majumdar.
+        <a
+          href="mailto: a.majumdar85+FamilyTree@gmail.com?&subject=Feedback%20on%20Family%2DTree"
+        >
+          Click to send feedback email</a
+        >
+      </footer>
+    </main>
+  </body>
+</html>
