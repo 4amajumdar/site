@@ -129,8 +129,8 @@ function showNav(show) {
   _select(".sidenav").style.width = show ? "15rem" : "0";
 }
 function showSpinner(show) {
-  _select("#loading").style.visibility = show ? "" : "hidden";
-  _select("main").style.visibility = show ? "hidden" : "";
+  _select("#loading").style.visibility = show ? "visible" : "hidden";
+  _select("main").style.visibility = show ? "hidden" : "visible";
 }
 
 function toggleGen() {
