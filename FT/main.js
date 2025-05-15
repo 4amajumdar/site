@@ -14,10 +14,10 @@ let fileWithData,
 
 document.addEventListener("DOMContentLoaded", () => {
   addMenuListeners();
-  setPresets();
-  const firstKey = Object.keys(presets)[0];
-  console.log(presets,firstKey);
-  showPresetFile(firstKey);
+  setPresets()
+  // console.log(presets, firstKey);
+  // showPresetFile(firstKey);
+  
 });
 function addMenuListeners() {
   const menus = _selectAll(".menu");
@@ -91,21 +91,22 @@ async function setView(newView) {
   await draw(fileWithData, view); //.then(showSpinner(false));
   showSpinner(false);
 }
-async function x(){
-  await setPresets()
-}
+
 async function setPresets() {
   for (const key in presets) delete presets[key];
 
   const params = new URLSearchParams(window.location.search);
   const presetParam = params.get("preset");
-  const externalPresets = await getPreset(presetParam);
-  for (const key in externalPresets)
-    if (key[0] !== "$") presets[key] = externalPresets[key];
+  if (presetParam) {
+    const externalPresets = await getPreset(presetParam);
+    for (const key in externalPresets)
+      if (key[0] !== "$") presets[key] = externalPresets[key];
+  }
   presets["Example"] =
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vSQqvT3WCpTuIlqLcqBYDRoF4Wi8tNVM4-Xu-A6sm_r4kioWKhgTLiwdFm37Fr6uPzPU3Uafl54XBmP/pub?gid=0&single=true&output=csv";
   setPresetMenus();
-  console.log(presets);
+  showPresetFile(Object.keys(presets)[0])
+
   function setPresetMenus() {
     const presetDiv = _removeChildren("#presets");
     for (const key in presets) {
