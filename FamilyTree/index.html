@@ -6,28 +6,21 @@
     <title>Family Tree</title>
     <link rel="stylesheet" href="opn.css" />
     <link rel="stylesheet" href="main.css" />
-    <script src="main.js" utf-8></script>
-    <script src="readfile.js"></script>
+    <script type="module" defer src="main.js" utf-8></script>
+    <!-- <script src="readfile.js"></script> -->
   </head>
 
   <body>
     <div class="sidenav">
-      <a href="javascript:void(0)" class="closebtn" onclick="showNav(false)"
-        >&times;</a
-      >
-      <a href="#" onclick="showNav(false);showLoadFileDialog()">Load file</a>
-      <a href="#" onclick="showNav(false);$.setView('left-right')"
-        >Left right view</a
-      >
-      <a href="#" onclick="showNav(false);$.setView('top-down')"
-        >Top down view</a
-      >
-      <a href="#" id="show-gen-menu" onclick="showNav(false);toggleGen()"
-        >Show generation</a
-      >
+      <a class="menu" id="close">&times;</a>
+      <a href="#" class="menu" id="load-file">Load file</a>
+      <a href="#" class="menu" id="set-view-left-right">Left right view</a>
+      <a href="#" class="menu" id="set-view-top-down">Top down view</a>
+      <a href="#" id="show-gen" class="menu">Show generation</a>
       <br />
       <div id="presets"></div>
-      <a href="help.html" target="_blank">Help</a>
+      <br />
+      <a href="help.html" id="show-help" class="menu" target="_blank">Help</a>
     </div>
     <dialog id="load-file-dialog">
       <form>
@@ -44,14 +37,12 @@
     </dialog>
     <input type="file" id="file-input" style="display: none" />
     <div id="loading">
-      <div>
-        <h2>Loading tree...</h2>
-        <div id="spinner"></div>
-      </div>
+      <h2>Loading...</h2>
+      <progress></progress>
     </div>
-    <main>
+    <main style="visibility: hidden">
       <h1>
-        <span class="menu" onclick="showNav(true)">&#9776;</span>
+        <span class="menu" id="show">&#9776;</span>
         <span id="main-title">Family Tree</span>
       </h1>
       <div id="comments"></div>
@@ -78,35 +69,5 @@
         >
       </footer>
     </main>
-    <template id="generation-template">
-      <div id="geneation">
-        <!-- <div id="generation-number"></div> -->
-        <div id="parents" class="flex-container"></div>
-        <div style="height: 0.1rem"></div>
-        <div id="children" class="flex-container"></div>
-        <br />
-      </div>
-    </template>
-    <template id="parents-template">
-      <div id="parents" class="flex-container">
-        <!-- <p>
-          <span id="main"></span>
-          <span id="plus">+</span>
-          <span id="spouse"></span>
-        </p> -->
-        <div id="main"></div>
-        <div id="plus">+</div>
-        <div id="spouse"></div>
-      </div>
-    </template>
-    <template id="radio-template">
-      <p>
-        <input type="radio" name="radio" value="x" />
-        <label>display </label>
-      </p>
-    </template>
-    <template id="pesron-template">
-      <div>X</div>
-    </template>
   </body>
 </html>

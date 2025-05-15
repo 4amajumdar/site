@@ -1,4 +1,5 @@
-async function streamCsvRecords(url, options, callback) {
+
+ export async function streamCsv(url, options, callback) {
   const defaults = {
     hasHeaders: true, //return raw data if false
     skipBlanks: true, //skip lines with no data
@@ -15,7 +16,6 @@ async function streamCsvRecords(url, options, callback) {
     ? Infinity
     : preview;
   let count = 0;
-  console.log(previewCount)
   try {
     function parse(raw) {
       if (!hasHeaders) return raw;
