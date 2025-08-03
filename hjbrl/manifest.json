@@ -1,7 +1,7 @@
 {
   "name": "Hjbrl Age Calculator",
   "short_name": "Hjbrl age calculator",
-  "start_url": "The URL that should be loaded when your application is opened",
+  "start_url": "https://4amajumdar.github.io/site/hjbrl/",
   "display": "standalone",
   "description": "A description for your application",
   "lang": " The default language of your application",
