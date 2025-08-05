@@ -25,6 +25,6 @@ function initialise() {
 }
 
 function dateChange(date) {
-  _banglaDate.textContent = `বাংলা তিথি: ${toBanglaDate(date)}`;
+  _banglaDate.textContent = `বাংলা দিন: ${toBanglaDate(date)}`;
   _hjbrlAge.textContent = hjbrlAge(date);
 }
