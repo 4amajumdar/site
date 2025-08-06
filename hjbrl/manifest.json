@@ -12,16 +12,10 @@
   "icons": [
     {
       "src": "./hjbrl.svg",
-      "sizes": "512x512",
-      "type": "image/svg",
-      "purpose": "maskable"
-    },
-    {
-      "src": "./hjbrl.svg",
-      "sizes": "192x192",
-      "type": "image/svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "any"
-    }
+    },
   ],
   "screenshots": [
     {
