@@ -78,7 +78,9 @@
           const resp = await fetch(
             `${WORKER_URL}/api/register-options?username=${username}`,
           );
+          console.log((resp})
           const opts = await resp.json();
+          console.log({opts})
           const regResponse = await startRegistration(opts);
           console.log("Entering verify")
           const verify = await fetch(`${WORKER_URL}/api/register-verify`, {
