@@ -55,7 +55,7 @@
     <script src="https://unpkg.com/@simplewebauthn/browser/dist/bundle/index.umd.min.js"></script>
   </head>
   <body>
-    <h1>Passkey Explorer (v 23 Apr 20:18))</h1>
+    <h1>Passkey Explorer (v 23 Apr 21:43)</h1>
 
     <section id="auth-controls">
       <input type="text" id="username" placeholder="Enter username" />
@@ -77,13 +77,15 @@
     <script>
       const { startRegistration, startAuthentication } = SimpleWebAuthnBrowser;
       const WORKER_URL = "https://passkey-worker.a-majumdar85.workers.dev";
-      const msg = document.getElementById("msg");
+      const msg = document.querySelector("#msg");
 
       // REGISTER
-      document.getElementById("register-btn").onclick = async () => {
-        const username = document.getElementById("username").value;
-        if (!username) return alert("Username required");
-
+      document.querySelector("#register-btn").onclick = async () => {
+        const username = document.querySelector("#username").value;
+        if (!username) {
+          msg.innerText = "Username required";
+          return;
+        }
         try {
           const resp = await fetch(
             `${WORKER_URL}/api/register-options?username=${username}`,
@@ -109,8 +111,8 @@
       };
 
       // LOGIN
-      document.getElementById("login-btn").onclick = async () => {
-        const username = document.getElementById("username").value;
+      document.querySelector("#login-btn").onclick = async () => {
+        const username = document.querySelector("#username").value;
         if (!username) return alert("Username required"); // ← added guard
 
         try {
@@ -129,9 +131,11 @@
 
           const result = await verify.json();
           if (result.verified) {
-            document.getElementById("members-only").style.display = "block";
-            document.getElementById("secret").innerText = result.secret;
-            document.getElementById("auth-controls").style.display = "none";
+            document.querySelector("#members-only").style.display = "block";
+            document.querySelector("#secret").innerText = JSON.stringify(
+              result.presets,
+            );
+            document.querySelector("#auth-controls").style.display = "none";
           } else {
             msg.innerText = "Login rejected by server.";
           }
