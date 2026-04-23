@@ -6,7 +6,18 @@
     <title>Passkey App (GitHub + Cloudflare)</title>
     <style>
       html {
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        font-family:
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          Oxygen,
+          Ubuntu,
+          Cantarell,
+          "Open Sans",
+          "Helvetica Neue",
+          sans-serif;
       }
       body {
         max-width: 600px;
@@ -73,19 +84,20 @@
       document.getElementById("register-btn").onclick = async () => {
         const username = document.getElementById("username").value;
         if (!username) return alert("Username required");
-        console.log("Entering try")
+
+        console.log("23 Apr 18:09+");
         try {
           const resp = await fetch(
             `${WORKER_URL}/api/register-options?username=${username}`,
           );
-          console.log({resp})
+          console.log({ resp, type: typeof resp });
           const opts = await resp.json();
-          console.log({opts})
-          console.log("23 Apr 17:41+")
+          console.log({ opts, type: typeof opts });
           // const regResponse = await startRegistration(opts);
-          const regResponse = await startRegistration({ optionsJSON: JSON.stringify(opts)});
-          
-          console.log("Entering verify")
+          const regResponse = await startRegistration({
+            optionsJSON: JSON.stringify(opts),
+          });
+          console.log({ regResponse, type: typeof regResponse });
           const verify = await fetch(`${WORKER_URL}/api/register-verify`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
