@@ -73,14 +73,14 @@
       document.getElementById("register-btn").onclick = async () => {
         const username = document.getElementById("username").value;
         if (!username) return alert("Username required");
-
+        console.log("Entering try")
         try {
           const resp = await fetch(
             `${WORKER_URL}/api/register-options?username=${username}`,
           );
           const opts = await resp.json();
           const regResponse = await startRegistration(opts);
-
+          console.log("Entering verify")
           const verify = await fetch(`${WORKER_URL}/api/register-verify`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
