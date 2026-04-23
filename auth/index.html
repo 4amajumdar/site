@@ -55,7 +55,7 @@
     <script src="https://unpkg.com/@simplewebauthn/browser/dist/bundle/index.umd.min.js"></script>
   </head>
   <body>
-    <h1>Passkey Explorer 23 Apr 18:12</h1>
+    <h1>Passkey Explorer (v 23 Apr 20:18))</h1>
 
     <section id="auth-controls">
       <input type="text" id="username" placeholder="Enter username" />
@@ -74,10 +74,9 @@
       <p>Secret content: <strong id="secret"></strong></p>
       <button onclick="location.reload()">Logout</button>
     </section>
-
     <script>
       const { startRegistration, startAuthentication } = SimpleWebAuthnBrowser;
-      const WORKER_URL = "https://passkey-worker.a-majumdar85.workers.dev"; // UPDATE THIS
+      const WORKER_URL = "https://passkey-worker.a-majumdar85.workers.dev";
       const msg = document.getElementById("msg");
 
       // REGISTER
@@ -85,27 +84,25 @@
         const username = document.getElementById("username").value;
         if (!username) return alert("Username required");
 
-        console.log("23 Apr 18:09+");
         try {
           const resp = await fetch(
             `${WORKER_URL}/api/register-options?username=${username}`,
           );
-          console.log({ resp, type: typeof resp });
           const opts = await resp.json();
-          console.log({ opts, type: typeof opts });
-          // const regResponse = await startRegistration(opts);
-          const regResponse = await startRegistration({
-            optionsJSON: JSON.stringify(opts),
-          });
-          console.log({ regResponse, type: typeof regResponse });
+
+          const regResponse = await startRegistration({ optionsJSON: opts }); // ← plain object, not stringified
+
           const verify = await fetch(`${WORKER_URL}/api/register-verify`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, data: regResponse }),
           });
 
-          if ((await verify.json()).verified)
+          if ((await verify.json()).verified) {
             msg.innerText = "Registered! Now try Login.";
+          } else {
+            msg.innerText = "Registration failed — try again.";
+          }
         } catch (e) {
           msg.innerText = "Error: " + e.message;
         }
@@ -114,12 +111,15 @@
       // LOGIN
       document.getElementById("login-btn").onclick = async () => {
         const username = document.getElementById("username").value;
+        if (!username) return alert("Username required"); // ← added guard
+
         try {
           const resp = await fetch(
             `${WORKER_URL}/api/login-options?username=${username}`,
           );
           const opts = await resp.json();
-          const authResponse = await startAuthentication(opts);
+
+          const authResponse = await startAuthentication({ optionsJSON: opts }); // ← consistent with register
 
           const verify = await fetch(`${WORKER_URL}/api/login-verify`, {
             method: "POST",
@@ -132,9 +132,11 @@
             document.getElementById("members-only").style.display = "block";
             document.getElementById("secret").innerText = result.secret;
             document.getElementById("auth-controls").style.display = "none";
+          } else {
+            msg.innerText = "Login rejected by server.";
           }
         } catch (e) {
-          msg.innerText = "Login failed";
+          msg.innerText = "Login failed: " + e.message; // ← shows real error
         }
       };
     </script>
