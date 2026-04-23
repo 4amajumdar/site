@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Passkey App (GitHub + Cloudflare)</title>
+    <style>
+      html {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      }
+      body {
+        max-width: 600px;
+        margin: 2rem auto;
+        line-height: 1.5;
+        padding: 1rem;
+        background: #f9f9f9;
+      }
+      section {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.5rem;
+      }
+      button {
+        padding: 0.6rem 1.2rem;
+        cursor: pointer;
+        background: #0070f3;
+        color: white;
+        border: none;
+        border-radius: 4px;
+      }
+      input {
+        padding: 0.6rem;
+        width: 200px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      #members-only {
+        border: 2px solid #0070f3;
+        display: none;
+      }
+    </style>
+    <script src="https://unpkg.com/@simplewebauthn/browser/dist/bundle/index.umd.min.js"></script>
+  </head>
+  <body>
+    <h1>Passkey Explorer</h1>
+
+    <section id="auth-controls">
+      <input type="text" id="username" placeholder="Enter username" />
+      <button id="register-btn">Register</button>
+      <button id="login-btn">Login</button>
+      <p id="msg"></p>
+    </section>
+
+    <section id="public-page">
+      <h2>Public Content</h2>
+      <p>This is visible to everyone on the web.</p>
+    </section>
+
+    <section id="members-only">
+      <h2>🚀 Members Area</h2>
+      <p>Secret content: <strong id="secret"></strong></p>
+      <button onclick="location.reload()">Logout</button>
+    </section>
+
+    <script>
+      const { startRegistration, startAuthentication } = SimpleWebAuthnBrowser;
+      const WORKER_URL = "https://passkey-worker.a-majumdar85.workers.dev"; // UPDATE THIS
+      const msg = document.getElementById("msg");
+
+      // REGISTER
+      document.getElementById("register-btn").onclick = async () => {
+        const username = document.getElementById("username").value;
+        if (!username) return alert("Username required");
+
+        try {
+          const resp = await fetch(
+            `${WORKER_URL}/api/register-options?username=${username}`,
+          );
+          const opts = await resp.json();
+          const regResponse = await startRegistration(opts);
+
+          const verify = await fetch(`${WORKER_URL}/api/register-verify`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, data: regResponse }),
+          });
+
+          if ((await verify.json()).verified)
+            msg.innerText = "Registered! Now try Login.";
+        } catch (e) {
+          msg.innerText = "Error: " + e.message;
+        }
+      };
+
+      // LOGIN
+      document.getElementById("login-btn").onclick = async () => {
+        const username = document.getElementById("username").value;
+        try {
+          const resp = await fetch(
+            `${WORKER_URL}/api/login-options?username=${username}`,
+          );
+          const opts = await resp.json();
+          const authResponse = await startAuthentication(opts);
+
+          const verify = await fetch(`${WORKER_URL}/api/login-verify`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, data: authResponse }),
+          });
+
+          const result = await verify.json();
+          if (result.verified) {
+            document.getElementById("members-only").style.display = "block";
+            document.getElementById("secret").innerText = result.secret;
+            document.getElementById("auth-controls").style.display = "none";
+          }
+        } catch (e) {
+          msg.innerText = "Login failed";
+        }
+      };
+    </script>
+  </body>
+</html>
