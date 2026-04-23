@@ -81,8 +81,9 @@
           console.log({resp})
           const opts = await resp.json();
           console.log({opts})
+          console.log("23 Apr 17:41+")
           // const regResponse = await startRegistration(opts);
-          const regResponse = await startRegistration({ optionsJSON: opts});
+          const regResponse = await startRegistration({ optionsJSON: JSON.stringify(opts)});
           
           console.log("Entering verify")
           const verify = await fetch(`${WORKER_URL}/api/register-verify`, {
