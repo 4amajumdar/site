@@ -70,8 +70,8 @@
     </section>
 
     <section id="members-only">
-      <h2>🚀 Members Area</h2>
-      <p>Secret content: <strong id="secret"></strong></p>
+      <h2>Logged in</h2>
+      <p>You have access to: <strong id="secret"></strong></p>
       <button onclick="location.reload()">Logout</button>
     </section>
     <script>
@@ -132,9 +132,7 @@
           const result = await verify.json();
           if (result.verified) {
             document.querySelector("#members-only").style.display = "block";
-            document.querySelector("#secret").innerText = JSON.stringify(
-              result.presets,
-            );
+            document.querySelector("#secret").innerText = Object.keys(result.presets);
             document.querySelector("#auth-controls").style.display = "none";
           } else {
             msg.innerText = "Login rejected by server.";
