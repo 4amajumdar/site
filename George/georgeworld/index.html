@@ -1,1 +1,824 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>GEORGEWORLD — City Planning Simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#16232B;
+    --panel:#1C2C34;
+    --panel-2:#213540;
+    --border:#33505C;
+    --paper:#EDEAE0;
+    --muted:#8FA3AC;
+    --road:#3D3D3D;
+    --road-line:#E8C15A;
+    --res:#6B9080;
+    --res-light:#A4C3B2;
+    --com:#D6A34A;
+    --com-light:#E8C97A;
+    --ind:#8A7A66;
+    --ind-light:#B0A18C;
+    --power:#E4B363;
+    --park:#4F7942;
+    --danger:#B5533C;
+    --good:#7FB37A;
+    --stadium:#3E7C3E;
+    --cricket:#7FA85A;
+    --pool:#2E6E96;
+    --school:#8E6BAE;
+    --college:#5B4B85;
+    --hotel:#B5794A;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--paper);font-family:'Space Grotesk',sans-serif;overflow:hidden;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  #app{display:flex;flex-direction:column;height:100vh;}
+
+  /* ---- Top bar ---- */
+  #topbar{
+    display:flex;align-items:center;gap:24px;
+    padding:10px 18px;background:var(--panel);
+    border-bottom:1px solid var(--border);
+    flex-shrink:0;flex-wrap:wrap;
+  }
+  #brand{display:flex;align-items:center;gap:10px;}
+  #brand .mark{width:20px;height:20px;background:
+    linear-gradient(135deg,var(--com) 0 50%,var(--res) 50% 100%);
+    border-radius:3px;flex-shrink:0;}
+  #brand h1{font-size:16px;letter-spacing:0.5px;font-weight:600;margin:0;}
+  .stat-chip{display:flex;flex-direction:column;line-height:1.1;}
+  .stat-chip .label{font-size:10px;color:var(--muted);letter-spacing:0.4px;}
+  .stat-chip .value{font-size:15px;font-weight:600;}
+  .value.neg{color:var(--danger);}
+  .value.pos{color:var(--good);}
+  #speedctl{display:flex;gap:4px;margin-left:auto;}
+  #speedctl button, #newcity{
+    background:var(--panel-2);border:1px solid var(--border);color:var(--paper);
+    padding:6px 12px;border-radius:5px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:12px;
+  }
+  #speedctl button.active{background:var(--com);color:#20160a;border-color:var(--com);}
+  #speedctl button:hover, #newcity:hover{border-color:var(--paper);}
+
+  /* ---- Main layout ---- */
+  #main{display:flex;flex:1;min-height:0;}
+
+  /* ---- Tool palette ---- */
+  #tools{
+    width:160px;flex-shrink:0;background:var(--panel);
+    border-right:1px solid var(--border);
+    padding:14px 10px;overflow-y:auto;
+  }
+  #tools h2{font-size:11px;text-transform:none;letter-spacing:0.4px;color:var(--muted);margin:14px 4px 10px;font-weight:500;}
+  #tools h2:first-child{margin-top:0;}
+  .tool{
+    display:flex;align-items:center;gap:9px;padding:8px 8px;margin-bottom:4px;
+    border-radius:6px;cursor:pointer;border:1px solid transparent;
+  }
+  .tool:hover{background:var(--panel-2);}
+  .tool.active{background:var(--panel-2);border-color:var(--com);}
+  .swatch{width:16px;height:16px;border-radius:3px;flex-shrink:0;border:1px solid rgba(255,255,255,0.15);}
+  .tool .tname{font-size:12.5px;font-weight:500;}
+  .tool .tcost{font-size:10px;color:var(--muted);margin-left:auto;font-family:'IBM Plex Mono',monospace;}
+  .divider{height:1px;background:var(--border);margin:12px 4px 0;}
+
+  /* ---- Canvas area ---- */
+  #canvaswrap{flex:1;display:flex;align-items:center;justify-content:center;position:relative;background:
+    repeating-linear-gradient(0deg, #142027, #142027 1px, transparent 1px, transparent 24px);
+    overflow:auto;}
+  #cityCanvas{background:#1A2B33;border:1px solid var(--border);cursor:crosshair;}
+  #hoverinfo{
+    position:absolute;bottom:10px;left:10px;background:rgba(20,32,39,0.9);
+    border:1px solid var(--border);padding:5px 10px;border-radius:5px;
+    font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);pointer-events:none;
+    max-width:70%;
+  }
+
+  /* ---- Right panel ---- */
+  #sidebar{width:230px;flex-shrink:0;background:var(--panel);border-left:1px solid var(--border);
+    padding:16px 14px;overflow-y:auto;}
+  #sidebar h2{font-size:11px;letter-spacing:0.4px;color:var(--muted);margin:0 0 10px;font-weight:500;}
+  .metric-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;}
+  .metric-row .m-label{font-size:12px;color:var(--muted);}
+  .metric-row .m-value{font-size:13px;font-weight:600;font-family:'IBM Plex Mono',monospace;}
+  .demandbar-wrap{margin-bottom:10px;}
+  .demandbar-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:3px;}
+  .demandbar-track{position:relative;height:8px;background:#0f1a1f;border-radius:4px;overflow:hidden;}
+  .demandbar-mid{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--border);}
+  .demandbar-fill{position:absolute;top:0;bottom:0;border-radius:4px;}
+  #taxctl{margin-top:14px;}
+  #taxctl input[type=range]{width:100%;accent-color:var(--com);}
+  #approvalWrap{margin-top:14px;}
+  #approvalBar{height:10px;border-radius:5px;background:#0f1a1f;overflow:hidden;margin-top:4px;}
+  #approvalFill{height:100%;background:linear-gradient(90deg,var(--danger),var(--com),var(--good));}
+
+  /* ---- Log ---- */
+  #log{
+    flex-shrink:0;height:78px;background:var(--panel);border-top:1px solid var(--border);
+    padding:8px 16px;overflow-y:auto;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);
+  }
+  #log div{margin-bottom:3px;}
+  #log .tag{color:var(--com);}
+
+  /* ---- Toast (session reminder) ---- */
+  #toast{
+    position:fixed;top:16px;left:50%;transform:translateX(-50%);
+    background:var(--panel-2);border:1px solid var(--com);color:var(--paper);
+    padding:10px 20px;border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;
+    opacity:0;pointer-events:none;transition:opacity 0.4s ease;z-index:60;max-width:80%;text-align:center;
+    box-shadow:0 6px 18px rgba(0,0,0,0.4);
+  }
+  #toast.show{opacity:1;}
+
+  /* ---- Overlay ---- */
+  #overlay{
+    position:fixed;inset:0;background:rgba(10,15,18,0.88);display:none;
+    align-items:center;justify-content:center;z-index:50;
+  }
+  #overlay .box{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:36px 40px;text-align:center;max-width:360px;}
+  #overlay h2{margin:0 0 10px;font-size:20px;color:var(--danger);}
+  #overlay p{color:var(--muted);font-size:13px;line-height:1.5;margin-bottom:20px;}
+  #overlay button{background:var(--com);border:none;color:#20160a;padding:10px 20px;border-radius:6px;
+    font-family:'Space Grotesk',sans-serif;font-weight:600;cursor:pointer;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="topbar">
+    <div id="brand"><div class="mark"></div><h1>GEORGEWORLD</h1></div>
+    <div class="stat-chip"><span class="label">DATE</span><span class="value mono" id="statDate">Mar 0001</span></div>
+    <div class="stat-chip"><span class="label">TREASURY</span><span class="value mono" id="statBudget">$20,000</span></div>
+    <div class="stat-chip"><span class="label">POPULATION</span><span class="value mono" id="statPop">0</span></div>
+    <div class="stat-chip"><span class="label">JOBS</span><span class="value mono" id="statJobs">0</span></div>
+    <div id="speedctl">
+      <button id="btnPause">⏸</button>
+      <button id="btnPlay" class="active">▶</button>
+      <button id="btnFast">⏩</button>
+      <button id="newcity" style="margin-left:8px;">New City</button>
+    </div>
+  </div>
+
+  <div id="main">
+    <div id="tools">
+      <h2>ZONING &amp; BUILD</h2>
+      <div class="tool active" data-tool="road"><div class="swatch" style="background:var(--road)"></div><span class="tname">Road</span><span class="tcost mono">$10</span></div>
+      <div class="tool" data-tool="res"><div class="swatch" style="background:var(--res)"></div><span class="tname">Residential</span><span class="tcost mono">$50</span></div>
+      <div class="tool" data-tool="com"><div class="swatch" style="background:var(--com)"></div><span class="tname">Commercial</span><span class="tcost mono">$75</span></div>
+      <div class="tool" data-tool="ind"><div class="swatch" style="background:var(--ind)"></div><span class="tname">Industrial</span><span class="tcost mono">$75</span></div>
+      <div class="tool" data-tool="power"><div class="swatch" style="background:var(--power)"></div><span class="tname">Power Line</span><span class="tcost mono">$5</span></div>
+      <div class="tool" data-tool="plant"><div class="swatch" style="background:#B5533C"></div><span class="tname">Power Plant</span><span class="tcost mono">$500</span></div>
+      <div class="tool" data-tool="park"><div class="swatch" style="background:var(--park)"></div><span class="tname">Park</span><span class="tcost mono">$100</span></div>
+
+      <div class="divider"></div>
+      <h2>SPORTS &amp; RECREATION</h2>
+      <div class="tool" data-tool="stadium"><div class="swatch" style="background:var(--stadium)"></div><span class="tname">Football Stadium</span><span class="tcost mono">$800</span></div>
+      <div class="tool" data-tool="cricket"><div class="swatch" style="background:var(--cricket)"></div><span class="tname">Cricket Green</span><span class="tcost mono">$400</span></div>
+      <div class="tool" data-tool="pool"><div class="swatch" style="background:var(--pool)"></div><span class="tname">Swimming Pool</span><span class="tcost mono">$250</span></div>
+
+      <div class="divider"></div>
+      <h2>EDUCATION</h2>
+      <div class="tool" data-tool="school"><div class="swatch" style="background:var(--school)"></div><span class="tname">School</span><span class="tcost mono">$300</span></div>
+      <div class="tool" data-tool="college"><div class="swatch" style="background:var(--college)"></div><span class="tname">College</span><span class="tcost mono">$600</span></div>
+
+      <div class="divider"></div>
+      <h2>HOSPITALITY</h2>
+      <div class="tool" data-tool="hotel"><div class="swatch" style="background:var(--hotel)"></div><span class="tname">Hotel</span><span class="tcost mono">$350</span></div>
+
+      <div class="divider"></div>
+      <h2>CLEAR</h2>
+      <div class="tool" data-tool="bulldoze"><div class="swatch" style="background:#5a1f1f"></div><span class="tname">Bulldoze</span><span class="tcost mono">$5</span></div>
+    </div>
+
+    <div id="canvaswrap">
+      <canvas id="cityCanvas" width="864" height="528"></canvas>
+      <div id="hoverinfo">Hover a tile to inspect it</div>
+    </div>
+
+    <div id="sidebar">
+      <h2>CITY DEMAND</h2>
+      <div class="demandbar-wrap">
+        <div class="demandbar-label"><span>Residential</span><span id="rdemandnum" class="mono">0</span></div>
+        <div class="demandbar-track"><div class="demandbar-mid"></div><div class="demandbar-fill" id="rdemandfill" style="background:var(--res)"></div></div>
+      </div>
+      <div class="demandbar-wrap">
+        <div class="demandbar-label"><span>Commercial</span><span id="cdemandnum" class="mono">0</span></div>
+        <div class="demandbar-track"><div class="demandbar-mid"></div><div class="demandbar-fill" id="cdemandfill" style="background:var(--com)"></div></div>
+      </div>
+      <div class="demandbar-wrap">
+        <div class="demandbar-label"><span>Industrial</span><span id="idemandnum" class="mono">0</span></div>
+        <div class="demandbar-track"><div class="demandbar-mid"></div><div class="demandbar-fill" id="idemandfill" style="background:var(--ind)"></div></div>
+      </div>
+
+      <div class="divider" style="margin-bottom:14px;"></div>
+      <h2>CIVIC METRICS</h2>
+      <div class="metric-row"><span class="m-label">Unemployment</span><span class="m-value" id="statUnemp">0%</span></div>
+      <div class="metric-row"><span class="m-label">Pollution index</span><span class="m-value" id="statPollution">0</span></div>
+      <div class="metric-row"><span class="m-label">Avg. land value</span><span class="m-value" id="statLand">50</span></div>
+      <div class="metric-row"><span class="m-label">Education score</span><span class="m-value" id="statEducation">0</span></div>
+      <div class="metric-row"><span class="m-label">Tourist revenue</span><span class="m-value" id="statTourism">$0</span></div>
+      <div class="metric-row"><span class="m-label">Monthly revenue</span><span class="m-value" id="statRevenue">$0</span></div>
+      <div class="metric-row"><span class="m-label">Monthly upkeep</span><span class="m-value" id="statExpense">$0</span></div>
+
+      <div id="approvalWrap">
+        <div class="demandbar-label"><span>Approval rating</span><span id="approvalnum" class="mono">70%</span></div>
+        <div id="approvalBar"><div id="approvalFill" style="width:70%"></div></div>
+      </div>
+
+      <div id="taxctl">
+        <div class="demandbar-label"><span>Property tax rate</span><span id="taxval" class="mono">9%</span></div>
+        <input type="range" id="taxSlider" min="0" max="20" value="9">
+      </div>
+    </div>
+  </div>
+
+  <div id="log"></div>
+</div>
+
+<div id="toast"></div>
+
+<div id="overlay">
+  <div class="box">
+    <h2>Treasury depleted</h2>
+    <p>Georgeworld's treasury has run dry and creditors have taken over municipal operations. Lower taxes carefully, balance zoning, and keep an eye on upkeep next time.</p>
+    <button id="restartBtn">Found a new city</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const COLS = 36, ROWS = 22, TILE = 24;
+  const canvas = document.getElementById('cityCanvas');
+  const ctx = canvas.getContext('2d');
+  const hoverinfo = document.getElementById('hoverinfo');
+
+  const COST = {
+    road:10, res:50, com:75, ind:75, power:5, plant:500, park:100,
+    stadium:800, cricket:400, pool:250,
+    school:300, college:600,
+    hotel:350,
+    bulldoze:5
+  };
+  const PLANT_CAPACITY = 450;
+  const BASE_CAP = {res:4, com:3, ind:5}; // per level-1 unit
+  const CIVIC_TYPES = ['stadium','cricket','pool','school','college','hotel'];
+  const FUNCTIONAL_TYPES = ['res','com','ind','stadium','cricket','pool','school','college','hotel'];
+
+  let state = null;
+
+  function freshState(){
+    const grid = [];
+    for(let r=0;r<ROWS;r++){
+      const row = [];
+      for(let c=0;c<COLS;c++) row.push({type:'empty', level:0, powered:false, land:50});
+      grid.push(row);
+    }
+    return {
+      grid,
+      budget: 20000,
+      month: 3, year: 1,
+      taxRate: 9,
+      speed: 'play', // pause | play | fast
+      demand: {res: 30, com: 15, ind: 10},
+      approval: 70,
+      tool: 'road',
+      mouseDown: false,
+      lastMonthlyStats: {revenue:0, expense:0, pop:0, jobs:0, unemployment:0, pollution:0, land:50, education:0, tourism:0}
+    };
+  }
+
+  state = freshState();
+
+  // ---------- helpers ----------
+  function inBounds(r,c){ return r>=0 && r<ROWS && c>=0 && c<COLS; }
+  function neighbors4(r,c){
+    return [[r-1,c],[r+1,c],[r,c-1],[r,c+1]].filter(([rr,cc])=>inBounds(rr,cc));
+  }
+  function isConductor(type){ return type !== 'empty'; }
+  function adjacentRoad(r,c){
+    return neighbors4(r,c).some(([rr,cc]) => state.grid[rr][cc].type === 'road');
+  }
+  function fmtMoney(n){
+    const sign = n<0 ? '-' : '';
+    return sign + '$' + Math.abs(Math.round(n)).toLocaleString();
+  }
+  function clamp(v,lo,hi){ return Math.max(lo, Math.min(hi, v)); }
+
+  function log(msg){
+    const el = document.getElementById('log');
+    const line = document.createElement('div');
+    const dateStr = monthName(state.month) + ' ' + String(state.year).padStart(4,'0');
+    line.innerHTML = '<span class="tag">['+dateStr+']</span> ' + msg;
+    el.prepend(line);
+    while(el.children.length > 40) el.removeChild(el.lastChild);
+  }
+
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function monthName(m){ return MONTHS[(m-1)%12]; }
+
+  // ---------- power network ----------
+  function computePower(){
+    for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) state.grid[r][c].powered = false;
+    const plants = [];
+    for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(state.grid[r][c].type==='plant') plants.push([r,c]);
+    if(plants.length===0) return;
+    let capacity = plants.length * PLANT_CAPACITY;
+    const visited = new Set();
+    const queue = [];
+    plants.forEach(([r,c])=>{ queue.push([r,c]); visited.add(r+','+c); });
+    let count = 0;
+    while(queue.length && count < capacity){
+      const [r,c] = queue.shift();
+      state.grid[r][c].powered = true;
+      count++;
+      for(const [rr,cc] of neighbors4(r,c)){
+        const key = rr+','+cc;
+        if(visited.has(key)) continue;
+        if(isConductor(state.grid[rr][cc].type)){
+          visited.add(key);
+          queue.push([rr,cc]);
+        }
+      }
+    }
+  }
+
+  // ---------- land value ----------
+  function computeLandValue(){
+    for(let r=0;r<ROWS;r++){
+      for(let c=0;c<COLS;c++){
+        let v = 50;
+        for(let dr=-2;dr<=2;dr++){
+          for(let dc=-2;dc<=2;dc++){
+            if(dr===0 && dc===0) continue;
+            const rr=r+dr, cc=c+dc;
+            if(!inBounds(rr,cc)) continue;
+            const dist = Math.abs(dr)+Math.abs(dc);
+            if(dist>2) continue;
+            const t = state.grid[rr][cc].type;
+            if(t==='park') v += (3-dist)*4;
+            else if(t==='cricket') v += (3-dist)*3;
+            else if(t==='pool') v += (3-dist)*2;
+            else if(t==='school' || t==='college') v += (3-dist)*3;
+            else if(t==='stadium') v += dist<=1 ? -4 : (3-dist)*3;
+            else if(t==='ind') v -= (3-dist)*5;
+            else if(t==='plant') v -= (3-dist)*8;
+          }
+        }
+        state.grid[r][c].land = clamp(v, 5, 100);
+      }
+    }
+  }
+
+  // ---------- population / jobs ----------
+  function getTotals(){
+    let pop=0, jobsC=0, jobsI=0, pollution=0;
+    for(let r=0;r<ROWS;r++){
+      for(let c=0;c<COLS;c++){
+        const t = state.grid[r][c];
+        if(t.type==='res' && t.level>0) pop += t.level*BASE_CAP.res;
+        if(t.type==='com' && t.level>0) jobsC += t.level*BASE_CAP.com;
+        if(t.type==='ind' && t.level>0){ jobsI += t.level*BASE_CAP.ind; pollution += t.level; }
+      }
+    }
+    return {pop, jobsC, jobsI, jobs: jobsC+jobsI, pollution};
+  }
+
+  function getCityCounts(){
+    const c0 = {road:0, power:0, plant:0, park:0, stadium:0, cricket:0, pool:0, school:0, college:0, hotel:0};
+    for(let r=0;r<ROWS;r++){
+      for(let c=0;c<COLS;c++){
+        const t = state.grid[r][c].type;
+        if(c0.hasOwnProperty(t)) c0[t]++;
+      }
+    }
+    return c0;
+  }
+
+  function updateDemand(totals, counts){
+    const {pop, jobsC, jobsI, jobs} = totals;
+    state.demand.res = clamp(20 + (jobs - pop*0.5)*0.9 - state.taxRate*1.2 + counts.school*0.8 + counts.college*0.4, -100, 100);
+    state.demand.com = clamp(10 + (pop*0.28 - jobsC)*1.1 - state.taxRate*1.0 + counts.college*1.2, -100, 100);
+    state.demand.ind = clamp(18 + (pop*0.22 - jobsI)*0.9 - state.taxRate*0.8 + counts.college*0.8, -100, 100);
+  }
+
+  // ---------- tourism / hotel revenue ----------
+  function computeTourismRevenue(){
+    let total = 0;
+    for(let r=0;r<ROWS;r++){
+      for(let c=0;c<COLS;c++){
+        if(state.grid[r][c].type !== 'hotel') continue;
+        let score = 0;
+        for(let dr=-3;dr<=3;dr++){
+          for(let dc=-3;dc<=3;dc++){
+            if(dr===0 && dc===0) continue;
+            const rr=r+dr, cc=c+dc;
+            if(!inBounds(rr,cc)) continue;
+            const dist = Math.abs(dr)+Math.abs(dc);
+            if(dist>3) continue;
+            const t = state.grid[rr][cc].type;
+            if(t==='stadium') score += (4-dist)*3;
+            else if(t==='cricket') score += (4-dist)*1.5;
+            else if(t==='pool') score += (4-dist)*1;
+            else if(t==='park') score += (4-dist)*0.5;
+          }
+        }
+        total += 20 + score*4; // baseline business travel + attraction bonus
+      }
+    }
+    return total;
+  }
+
+  // ---------- simulation tick (1 month) ----------
+  function tick(){
+    computePower();
+    computeLandValue();
+    let totals = getTotals();
+    const counts = getCityCounts();
+    updateDemand(totals, counts);
+
+    const educationScore = clamp(counts.school*3 + counts.college*6, 0, 60);
+    const educationFactor = 1 + educationScore/300;
+
+    for(let r=0;r<ROWS;r++){
+      for(let c=0;c<COLS;c++){
+        const tile = state.grid[r][c];
+        if(tile.type!=='res' && tile.type!=='com' && tile.type!=='ind') continue;
+        const roaded = adjacentRoad(r,c);
+        const powered = tile.powered;
+        const demandVal = state.demand[tile.type];
+        const landFactor = clamp(tile.land/50, 0.5, 1.6);
+
+        if(roaded && powered){
+          if(demandVal > 0 && tile.level < 3){
+            let chance = (0.045 + demandVal/100*0.16) * landFactor;
+            if(tile.type==='res') chance *= educationFactor;
+            if(Math.random() < chance) tile.level++;
+          } else if(demandVal < 0 && tile.level > 0){
+            const chance = Math.abs(demandVal)/100*0.05;
+            if(Math.random() < chance) tile.level--;
+          }
+        } else {
+          if(tile.level > 0 && Math.random() < 0.10) tile.level--;
+        }
+      }
+    }
+
+    totals = getTotals();
+    const laborForce = totals.pop * 0.55;
+    const unemployment = laborForce>0 ? clamp((laborForce - totals.jobs)/laborForce*100, 0, 100) : 0;
+
+    // finance
+    const tourismRevenue = computeTourismRevenue();
+    const revenue = (totals.pop*0.35 + totals.jobsC*0.55 + totals.jobsI*0.45) * (state.taxRate/100) * 3.4 + tourismRevenue*0.5;
+    const expense = counts.road*0.8 + counts.power*0.5 + counts.plant*45 + counts.park*3 +
+      counts.stadium*25 + counts.cricket*10 + counts.pool*8 + counts.school*15 + counts.college*30 + counts.hotel*5;
+    state.budget += (revenue - expense);
+
+    // approval
+    let avgLand = 0, tilesN=0;
+    for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){ avgLand += state.grid[r][c].land; tilesN++; }
+    avgLand = avgLand/tilesN;
+    const civicBonus = clamp(counts.school*1.0 + counts.college*1.4 + counts.stadium*1.6 + counts.cricket*0.8 + counts.pool*0.6, 0, 20);
+    const target = clamp(100 - state.taxRate*2.6 - unemployment*0.5 - totals.pollution*0.6 + counts.park*1.4 + civicBonus + (avgLand-50)*0.3, 0, 100);
+    state.approval += (target - state.approval) * 0.15;
+
+    state.lastMonthlyStats = {
+      revenue, expense, pop: totals.pop, jobs: totals.jobs,
+      unemployment, pollution: totals.pollution, land: avgLand,
+      education: educationScore, tourism: tourismRevenue*0.5
+    };
+
+    // advance calendar
+    state.month++;
+    if(state.month > 12){ state.month = 1; state.year++; }
+
+    // milestones / warnings
+    if(state.budget < 0 && state.budget > -500){
+      log('Treasury has gone into the red. Raise taxes or cut zoning.');
+    }
+    if(state.budget <= -3000){
+      showGameOver();
+    }
+    if(totals.pop >= 100 && totals.pop < 100+BASE_CAP.res){
+      log('Population has passed 100 residents.');
+    }
+
+    updateUI();
+    render();
+  }
+
+  // ---------- placement ----------
+  function placeAt(r,c){
+    if(!inBounds(r,c)) return;
+    const tile = state.grid[r][c];
+    const tool = state.tool;
+
+    if(tool === 'bulldoze'){
+      if(tile.type === 'empty') return;
+      if(state.budget < COST.bulldoze) return;
+      state.budget -= COST.bulldoze;
+      tile.type = 'empty'; tile.level = 0; tile.powered = false;
+      render(); updateUI();
+      return;
+    }
+
+    if(tile.type !== 'empty') return; // must bulldoze first
+    const cost = COST[tool];
+    if(state.budget < cost) return;
+    state.budget -= cost;
+    tile.type = tool;
+    tile.level = (tool==='res'||tool==='com'||tool==='ind') ? 0 : 1;
+    updateUI();
+    render();
+  }
+
+  // ---------- rendering ----------
+  function tileColors(type, level){
+    if(type==='res') return level===0? 'rgba(107,144,128,0.25)' : ['#4E6B5F','#6B9080','#8FB39E','#A4C3B2'][level];
+    if(type==='com') return level===0? 'rgba(214,163,74,0.25)' : ['#8C6A2E','#D6A34A','#E3BB6E','#E8C97A'][level];
+    if(type==='ind') return level===0? 'rgba(138,122,102,0.25)' : ['#5F5344','#8A7A66','#A0917C','#B0A18C'][level];
+    return '#000';
+  }
+
+  function render(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = '#1A2B33';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    for(let r=0;r<ROWS;r++){
+      for(let c=0;c<COLS;c++){
+        const x=c*TILE, y=r*TILE;
+        const tile = state.grid[r][c];
+
+        ctx.strokeStyle = 'rgba(51,80,92,0.35)';
+        ctx.strokeRect(x+0.5,y+0.5,TILE-1,TILE-1);
+
+        if(tile.type==='empty') continue;
+
+        if(tile.type==='road'){
+          ctx.fillStyle = '#3D3D3D';
+          ctx.fillRect(x,y,TILE,TILE);
+          ctx.strokeStyle = 'rgba(232,193,90,0.7)';
+          ctx.setLineDash([3,3]);
+          ctx.beginPath();
+          ctx.moveTo(x, y+TILE/2); ctx.lineTo(x+TILE, y+TILE/2);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        } else if(tile.type==='power'){
+          ctx.fillStyle = 'rgba(228,179,99,0.12)';
+          ctx.fillRect(x,y,TILE,TILE);
+          ctx.strokeStyle = tile.powered ? '#E4B363' : 'rgba(228,179,99,0.35)';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(x+TILE/2, y+3); ctx.lineTo(x+TILE/2, y+TILE-3);
+          ctx.stroke();
+          ctx.lineWidth = 1;
+        } else if(tile.type==='plant'){
+          ctx.fillStyle = tile.powered ? '#B5533C' : '#5a2c22';
+          ctx.fillRect(x+2,y+2,TILE-4,TILE-4);
+          ctx.fillStyle = '#EDEAE0';
+          ctx.fillRect(x+5,y+4,3,8);
+          ctx.fillRect(x+TILE-8,y+4,3,8);
+        } else if(tile.type==='park'){
+          ctx.fillStyle = '#33502C';
+          ctx.fillRect(x,y,TILE,TILE);
+          ctx.fillStyle = '#4F7942';
+          ctx.beginPath();
+          ctx.arc(x+TILE/2, y+TILE/2, TILE/3, 0, Math.PI*2);
+          ctx.fill();
+        } else if(tile.type==='stadium'){
+          ctx.fillStyle = '#3E7C3E';
+          ctx.fillRect(x+1,y+1,TILE-2,TILE-2);
+          ctx.strokeStyle = '#EDEAE0';
+          ctx.lineWidth = 1.4;
+          ctx.beginPath();
+          ctx.ellipse(x+TILE/2, y+TILE/2, TILE/2-4, TILE/3-2, 0, 0, Math.PI*2);
+          ctx.stroke();
+          ctx.lineWidth = 1;
+        } else if(tile.type==='cricket'){
+          ctx.fillStyle = '#7FA85A';
+          ctx.fillRect(x+1,y+1,TILE-2,TILE-2);
+          ctx.fillStyle = '#D8C89A';
+          ctx.beginPath();
+          ctx.ellipse(x+TILE/2, y+TILE/2, TILE/4, TILE/6, 0, 0, Math.PI*2);
+          ctx.fill();
+        } else if(tile.type==='pool'){
+          ctx.fillStyle = '#2E6E96';
+          ctx.fillRect(x+2,y+2,TILE-4,TILE-4);
+          ctx.strokeStyle = 'rgba(237,234,224,0.8)';
+          ctx.beginPath();
+          ctx.moveTo(x+4, y+TILE/2-3); ctx.quadraticCurveTo(x+TILE/2, y+TILE/2-8, x+TILE-4, y+TILE/2-3);
+          ctx.moveTo(x+4, y+TILE/2+4); ctx.quadraticCurveTo(x+TILE/2, y+TILE/2-1, x+TILE-4, y+TILE/2+4);
+          ctx.stroke();
+        } else if(tile.type==='school'){
+          ctx.fillStyle = '#8E6BAE';
+          ctx.fillRect(x+2,y+6,TILE-4,TILE-8);
+          ctx.beginPath();
+          ctx.moveTo(x+2, y+6); ctx.lineTo(x+TILE/2, y+1); ctx.lineTo(x+TILE-2, y+6);
+          ctx.closePath();
+          ctx.fillStyle = '#6B5490';
+          ctx.fill();
+          ctx.fillStyle = '#EDEAE0';
+          ctx.fillRect(x+TILE/2-1.5, y+TILE-9, 3, 6);
+        } else if(tile.type==='college'){
+          ctx.fillStyle = '#5B4B85';
+          ctx.fillRect(x+2,y+5,TILE-4,TILE-7);
+          ctx.fillStyle = '#EDEAE0';
+          ctx.fillRect(x+5,y+7,2,TILE-10);
+          ctx.fillRect(x+TILE/2-1,y+7,2,TILE-10);
+          ctx.fillRect(x+TILE-7,y+7,2,TILE-10);
+          ctx.fillRect(x+2,y+4,TILE-4,2);
+        } else if(tile.type==='hotel'){
+          ctx.fillStyle = '#B5794A';
+          ctx.fillRect(x+2,y+2,TILE-4,TILE-4);
+          ctx.fillStyle = '#EDEAE0';
+          for(let wy=0; wy<2; wy++){
+            for(let wx=0; wx<2; wx++){
+              ctx.fillRect(x+6+wx*8, y+6+wy*8, 3, 3);
+            }
+          }
+        } else if(tile.type==='res' || tile.type==='com' || tile.type==='ind'){
+          ctx.fillStyle = tileColors(tile.type, tile.level);
+          if(tile.level===0){
+            ctx.setLineDash([2,2]);
+            ctx.strokeStyle = tileColors(tile.type,1);
+            ctx.strokeRect(x+3,y+3,TILE-6,TILE-6);
+            ctx.setLineDash([]);
+          } else {
+            const inset = 2 + (3-tile.level);
+            ctx.fillRect(x+inset, y+inset, TILE-inset*2, TILE-inset*2);
+            if(tile.level>=2){
+              ctx.fillStyle = 'rgba(255,255,255,0.18)';
+              ctx.fillRect(x+inset, y+inset, TILE-inset*2, 3);
+            }
+          }
+        }
+
+        if(FUNCTIONAL_TYPES.includes(tile.type) && (!tile.powered || !adjacentRoad(r,c))){
+          ctx.fillStyle = 'rgba(0,0,0,0.35)';
+          ctx.fillRect(x,y,TILE,TILE);
+        }
+      }
+    }
+  }
+
+  // ---------- UI updates ----------
+  function updateUI(){
+    document.getElementById('statDate').textContent = monthName(state.month)+' '+String(state.year).padStart(4,'0');
+    const bEl = document.getElementById('statBudget');
+    bEl.textContent = fmtMoney(state.budget);
+    bEl.className = 'value mono ' + (state.budget<0?'neg':'pos');
+    const s = state.lastMonthlyStats;
+    document.getElementById('statPop').textContent = Math.round(s.pop).toLocaleString();
+    document.getElementById('statJobs').textContent = Math.round(s.jobs).toLocaleString();
+    document.getElementById('statUnemp').textContent = Math.round(s.unemployment)+'%';
+    document.getElementById('statPollution').textContent = Math.round(s.pollution);
+    document.getElementById('statLand').textContent = Math.round(s.land);
+    document.getElementById('statEducation').textContent = Math.round(s.education);
+    document.getElementById('statTourism').textContent = fmtMoney(s.tourism);
+    document.getElementById('statRevenue').textContent = fmtMoney(s.revenue);
+    document.getElementById('statExpense').textContent = fmtMoney(s.expense);
+
+    setDemandBar('r', state.demand.res);
+    setDemandBar('c', state.demand.com);
+    setDemandBar('i', state.demand.ind);
+
+    document.getElementById('approvalnum').textContent = Math.round(state.approval)+'%';
+    document.getElementById('approvalFill').style.width = state.approval+'%';
+    document.getElementById('taxval').textContent = state.taxRate+'%';
+  }
+
+  function setDemandBar(prefix, val){
+    const fill = document.getElementById(prefix+'demandfill');
+    const num = document.getElementById(prefix+'demandnum');
+    num.textContent = Math.round(val);
+    const pct = Math.abs(val)/2;
+    if(val>=0){
+      fill.style.left = '50%';
+      fill.style.width = pct+'%';
+      fill.style.background = getComputedStyle(document.documentElement).getPropertyValue(
+        prefix==='r' ? '--res' : prefix==='c' ? '--com' : '--ind');
+    } else {
+      fill.style.left = (50-pct)+'%';
+      fill.style.width = pct+'%';
+      fill.style.background = '#B5533C';
+    }
+  }
+
+  function showGameOver(){
+    state.speed = 'pause';
+    document.getElementById('overlay').style.display = 'flex';
+  }
+
+  // ---------- input ----------
+  document.querySelectorAll('.tool').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      document.querySelectorAll('.tool').forEach(t=>t.classList.remove('active'));
+      el.classList.add('active');
+      state.tool = el.dataset.tool;
+    });
+  });
+
+  function tileFromEvent(e){
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left, y = e.clientY - rect.top;
+    const c = Math.floor(x/TILE), r = Math.floor(y/TILE);
+    return [r,c];
+  }
+
+  canvas.addEventListener('mousedown', e=>{
+    state.mouseDown = true;
+    const [r,c] = tileFromEvent(e);
+    placeAt(r,c);
+  });
+  window.addEventListener('mouseup', ()=>{ state.mouseDown = false; });
+  canvas.addEventListener('mousemove', e=>{
+    const [r,c] = tileFromEvent(e);
+    if(inBounds(r,c)){
+      const tile = state.grid[r][c];
+      let desc = tile.type==='empty' ? 'Empty lot' : tile.type.toUpperCase();
+      if(tile.type==='res'||tile.type==='com'||tile.type==='ind'){
+        desc += ' · density level ' + tile.level + ' · land value ' + Math.round(tile.land) +
+          (tile.powered? ' · powered' : ' · NO POWER') + (adjacentRoad(r,c)? '' : ' · NO ROAD ACCESS');
+      } else if(CIVIC_TYPES.includes(tile.type)){
+        desc += ' · land value ' + Math.round(tile.land) +
+          (tile.powered? ' · powered' : ' · NO POWER') + (adjacentRoad(r,c)? '' : ' · NO ROAD ACCESS');
+      }
+      hoverinfo.textContent = 'Tile ('+c+','+r+'): ' + desc;
+    }
+    if(state.mouseDown) placeAt(r,c);
+  });
+
+  // ---------- controls ----------
+  document.getElementById('taxSlider').addEventListener('input', e=>{
+    state.taxRate = parseInt(e.target.value,10);
+    document.getElementById('taxval').textContent = state.taxRate+'%';
+  });
+
+  function setSpeed(sp){
+    state.speed = sp;
+    document.getElementById('btnPause').classList.toggle('active', sp==='pause');
+    document.getElementById('btnPlay').classList.toggle('active', sp==='play');
+    document.getElementById('btnFast').classList.toggle('active', sp==='fast');
+  }
+  document.getElementById('btnPause').addEventListener('click', ()=>setSpeed('pause'));
+  document.getElementById('btnPlay').addEventListener('click', ()=>setSpeed('play'));
+  document.getElementById('btnFast').addEventListener('click', ()=>setSpeed('fast'));
+
+  document.getElementById('newcity').addEventListener('click', ()=>{
+    if(confirm('Start a new city? Current progress will be lost.')) resetGame();
+  });
+  document.getElementById('restartBtn').addEventListener('click', ()=>{
+    document.getElementById('overlay').style.display = 'none';
+    resetGame();
+  });
+
+  function resetGame(){
+    state = freshState();
+    document.getElementById('taxSlider').value = 9;
+    document.getElementById('log').innerHTML = '';
+    setSpeed('play');
+    log('Welcome to GEORGEWORLD. New city founded. Treasury: $20,000.');
+    updateUI();
+    render();
+  }
+
+  // ---------- session reminder (every 15 real minutes) ----------
+  const sessionStart = Date.now();
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._hideTimer);
+    t._hideTimer = setTimeout(()=>t.classList.remove('show'), 7000);
+  }
+  setInterval(()=>{
+    const mins = Math.round((Date.now()-sessionStart)/60000);
+    showToast('⏰ You\'ve been playing GEORGEWORLD for ' + mins + ' minutes — a good moment to take a short break if you need one.');
+    log('Session reminder: ' + mins + ' minutes of play so far.');
+  }, 15*60*1000);
+
+  // ---------- game loop ----------
+  let lastTick = 0;
+  function loop(ts){
+    if(state.speed !== 'pause'){
+      const interval = state.speed === 'fast' ? 450 : 1600;
+      if(ts - lastTick > interval){
+        lastTick = ts;
+        tick();
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+
+  log('Welcome to GEORGEWORLD. New city founded. Treasury: $20,000.');
+  updateUI();
+  render();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
