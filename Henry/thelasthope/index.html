@@ -230,7 +230,7 @@
     <div class="subtitle">A Majumdar Saga</div>
     <p class="lore" id="loreText">
       The Fith fleet has blockaded the Galactic rift. Every other Shadow pilot is gone.
-      You fly The Last Hope — a battle-scarred interceptor rigged with a volatile Aether core —
+      You fly The Last Hope — a battle-scarred startfighter rigged with a volatile Aether core —
       the only fighter left between the blockade and the resistance's escape route.
     </p>
     <button class="glow-btn" id="startBtn">Launch</button>
@@ -238,6 +238,7 @@
       <span><b>WASD / Arrows</b> — Maneuver</span>
       <span><b>Space</b> — Fire Cannons</span>
       <span><b>Shift</b> — Aether Burst</span>
+      <p>Created by Henry Majumdar</p>
     </div>
   </div>
 </div>
@@ -692,8 +693,8 @@
   const storyBeats = {
     5: {
       eyebrow: "Transmission — Command",
-      heading: "Ashwing Squadron Is Gone",
-      body: "Static, then a voice: \"Ashwing Lead, do you copy? ...Ashwing Lead is down. Ashwing Two, Three, Four — all down.\" The Last Hope is the only fighter still moving in the Kessarine Drift. Command's next words are quieter: \"You're what we've got left. Hold the line.\""
+      heading: "Shadow Squadron Is Gone",
+      body: "Static, then a voice: \"Shadow Lead, do you copy? ...Shadow Lead is down. Shadow Two, Three, Four — all down.\" The Last Hope is the only fighter still moving in the Galactic Rift. Command's next words are quieter: \"You're what we've got left. Hold the line.\""
     },
     10: {
       eyebrow: "Transmission — Command",
@@ -789,7 +790,7 @@
       overlay.classList.remove('hidden');
       hud.classList.add('hidden');
       titleText.textContent = "SIGNAL LOST";
-      loreText.textContent = `The Last Hope went dark over the Kessarine Drift. Final score: ${score} — wave ${wave}. The resistance needs another pilot. Care to fly again?`;
+      loreText.textContent = `The Last Hope went dark over the Galactic Rift. Final score: ${score} — wave ${wave}. The resistance needs another pilot. Care to fly again?`;
       startBtn.textContent = "Relaunch";
     }, 900);
   }
